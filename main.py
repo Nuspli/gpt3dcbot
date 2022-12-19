@@ -1,52 +1,36 @@
-import openai
-import os
 import logging
+import os
+from pathlib import Path
+
 import discord
 from discord.ext import commands
+
 from dotenv import load_dotenv
 
 load_dotenv()
 
-logging.basicConfig(level=logging.INFO)
 log = logging.getLogger('BOT-MAIN')
 
+intents = discord.Intents.default()
+intents.members = True
+
 bot = commands.Bot(
-  command_prefix=None,
-  intents=discord.Intents.default(),
-  activity=discord.Activity(type=discord.ActivityType.playing, name="with humans"),
-  sync_commands=False,
-  delete_not_existing_commands=False
+    command_prefix=commands.when_mentioned_or(),
+    intents=intents,
+    activity=discord.Activity(type=discord.ActivityType.playing, name='Hello World!'),
+    status=discord.Status.online,
+    sync_commands=True,
+    delete_not_existing_commands=True
 )
 
 if __name__ == '__main__':
-  log.info("starting...")
-  token = os.getenv('BOT_TOKEN')
-  bot.run(token)
+    log.info('Starting bot...')
+    cogs = [file.stem for file in Path('cogs').glob('**/*.py') if not file.name.startswith('__')]
+    log.info(f'Loading {len(cogs)} cogs...')
 
-openai.api_key = "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"
+    for cog in cogs:
+        bot.load_extension(f'cogs.{cog}')
+        log.info(f'Loaded cog {cog}')
 
-def get_response(question):
-  response = openai.Completion.create(
-    model="text-davinci-003",
-    prompt=question,
-    temperature=0.9,
-    max_tokens=150,
-    top_p=1,
-    frequency_penalty=0,
-    presence_penalty=0.6,
-    stop=None
-  )
-
-  return response["choices"][0]["text"]
-
-
-def question():
-
-  question = input("Q: ")
-
-  return question
-
-
-#answer = "A: " + str(get_response(question()))
-
-#print(answer)
+    token = os.getenv('BOT_TOKEN')
+    bot.run(token)
