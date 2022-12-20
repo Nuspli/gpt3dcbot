@@ -17,10 +17,15 @@ class MyClient(discord.Client):
         if message.author.id == self.user.id:
             return
 
+        log = open('log.txt', 'w')
+        msg = str(message.content)
+
+        log.write("user: " + msg + "\n")
+
         try:
             response = openai.Completion.create(
                 model="text-davinci-003",
-                prompt="You are a funny chat bot. You are very unfriendly and extremely sarcastic. You do not answer every question correctly. "+str(message.content),
+                prompt="You are a funny chat bot. You are very unfriendly and extremely sarcastic. You do not answer every question correctly. " + msg,
                 temperature=0.9,
                 max_tokens=150,
                 top_p=1,
@@ -31,10 +36,20 @@ class MyClient(discord.Client):
 
             answer = response["choices"][0]["text"]
 
-            await message.channel.send(answer)
+            if message.guild == None:
+                await message.author.send(answer)
+            else:
+                await message.channel.send(answer)
+
+            log.write("bot : " + answer + "\n")
 
         except:
             await message.channel.send("You messed up. Try again.")
+            log.write("bot : You messed up. Try again.\n")
+
+        log.close()
+
+
 
 intents = discord.Intents.default()
 
