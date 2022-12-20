@@ -5,7 +5,7 @@ import openai
 
 load_dotenv()
 
-openai.api_key = os.getenv('API_TOKEN')
+openai.api_key = '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'
 token = os.getenv('BOT_TOKEN')
 
 class MyClient(discord.Client):
