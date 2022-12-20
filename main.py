@@ -1,36 +1,44 @@
-import logging
 import os
-from pathlib import Path
-
 import discord
-from discord.ext import commands
-
 from dotenv import load_dotenv
+import openai
 
 load_dotenv()
 
-log = logging.getLogger('BOT-MAIN')
+openai.api_key = os.getenv('API_TOKEN')
+token = os.getenv('BOT_TOKEN')
+
+class MyClient(discord.Client):
+    async def on_ready(self):
+        print(f'Logged in as {self.user} (ID: {self.user.id})')
+        print('------')
+
+    async def on_message(self, message):
+        if message.author.id == self.user.id:
+            return
+
+        try:
+            response = openai.Completion.create(
+                model="text-davinci-003",
+                prompt="You are a funny chat bot. You are very unfriendly and extremely sarcastic. You do not answer every question correctly. "+str(message.content),
+                temperature=0.9,
+                max_tokens=150,
+                top_p=1,
+                frequency_penalty=0,
+                presence_penalty=0.6,
+                stop=None
+            )
+
+            answer = response["choices"][0]["text"]
+
+            await message.channel.send(answer)
+
+        except:
+            await message.channel.send("You messed up. Try again.")
 
 intents = discord.Intents.default()
-intents.members = True
 
-bot = commands.Bot(
-    command_prefix=commands.when_mentioned_or(),
-    intents=intents,
-    activity=discord.Activity(type=discord.ActivityType.playing, name='Hello World!'),
-    status=discord.Status.online,
-    sync_commands=True,
-    delete_not_existing_commands=True
-)
+client = MyClient(intents=intents)
 
 if __name__ == '__main__':
-    log.info('Starting bot...')
-    cogs = [file.stem for file in Path('cogs').glob('**/*.py') if not file.name.startswith('__')]
-    log.info(f'Loading {len(cogs)} cogs...')
-
-    for cog in cogs:
-        bot.load_extension(f'cogs.{cog}')
-        log.info(f'Loaded cog {cog}')
-
-    token = os.getenv('BOT_TOKEN')
-    bot.run(token)
+    client.run(token)
