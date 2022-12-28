@@ -11,14 +11,14 @@ load_dotenv()
 
 openai.api_key = os.getenv('API_KEY')
 # go to https://beta.openai.com/account/api-keys to create one, if you don't have an openai account, sign up first.
-# replace line 9 with openai.api_key = 'YOUR API KEY'
+# replace line 12 with openai.api_key = 'YOUR API KEY'
 token = os.getenv('BOT_TOKEN')
 # if you don't know how to make a discord bot, go watch a tutorial or...
 
 # quickstart:   - go to https://discord.dev
 #               - applications -> new application -> set it up
 #               - bot -> add bot -> under Privileged Gateway Intents enable "Message content intent" (important)
-#               - bot -> reset token: replace "token = os.getenv('BOT_TOKEN')" (line 12) with the token in ''
+#               - bot -> reset token: replace "token = os.getenv('BOT_TOKEN')" (line 15) with the token in ''
 #               - oauth2 -> not sure if this is necessary, but use in-app and tick bot and applications.commands, admin
 #               - -> url-generator -> just select bot and admin -> make a server first and use the link to invite it
 #               - now you can use any of the text channels or DM the bot
